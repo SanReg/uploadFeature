@@ -1,0 +1,14 @@
+[{
+  "_id": {
+    "$oid": "695e20c16ee7505bf5c5d898"
+  },
+  "title": "TurnItIn Check",
+  "author": "Service",
+  "description": "Plagiarism similarity check via TurnItIn. Requires file upload.",
+  "price": 1,
+  "quantity": -1,
+  "createdAt": {
+    "$date": "2026-01-07T09:00:49.685Z"
+  },
+  "__v": 0
+}]

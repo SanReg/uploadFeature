@@ -1,0 +1,14 @@
+{
+  "name": "uploadfeature",
+  "version": "1.0.0",
+  "description": "Express app to insert/delete books collection via On/Off buttons",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.6.1",
+    "express": "^4.18.2",
+    "mongodb": "^5.9.0"
+  }
+}
