@@ -148,7 +148,10 @@ app.post('/on', async (req, res) => {
   try {
     const col = db.collection(COLLECTION);
     const current = await col.countDocuments();
-    if (current > 0) return res.status(400).json({ error: 'Collection already has documents. Please turn off (delete) first.' });
+    if (current > 0) {
+      console.log(`[${new Date().toISOString()}] /on denied — collection has ${current} docs`);
+      return res.status(400).json({ error: 'Collection already has documents. Please turn off (delete) first.' });
+    }
 
     const filePath = path.join(__dirname, 'test.books.json');
     const raw = await fs.readFile(filePath, 'utf8');
@@ -159,13 +162,18 @@ app.post('/on', async (req, res) => {
 
     // Insert documents, ignore duplicate key errors by using ordered:false
     const result = await col.insertMany(docs, { ordered: false });
+
+    console.log(`[${new Date().toISOString()}] /on — inserted ${result.insertedCount} docs`);
+    // if you want IDs: ${Object.values(result.insertedIds).map(id => id.toString()).join(', ')}
+
     res.json({ message: 'Inserted successfully', insertedCount: result.insertedCount, insertedIds: result.insertedIds });
   } catch (err) {
     // If duplicate key errors occur, MongoDB driver will still return a result or throw
     if (err.code === 11000) {
+      console.warn(`[${new Date().toISOString()}] /on partial - duplicate key: ${err.message}`);
       return res.status(200).json({ message: 'Some documents already existed (duplicate keys)', error: err.message });
     }
-    console.error(err);
+    console.error(`[${new Date().toISOString()}] /on error:`, err);
     res.status(500).json({ error: err.message });
   }
 });
@@ -175,12 +183,18 @@ app.post('/off', async (req, res) => {
   try {
     const col = db.collection(COLLECTION);
     const current = await col.countDocuments();
-    if (current === 0) return res.status(400).json({ error: 'Collection is empty. Nothing to delete.' });
+    if (current === 0) {
+      console.log(`[${new Date().toISOString()}] /off denied — collection is empty`);
+      return res.status(400).json({ error: 'Collection is empty. Nothing to delete.' });
+    }
 
     const result = await col.deleteMany({});
+
+    console.log(`[${new Date().toISOString()}] /off — deleted ${result.deletedCount} docs`);
+
     res.json({ message: 'All documents deleted', deletedCount: result.deletedCount });
   } catch (err) {
-    console.error(err);
+    console.error(`[${new Date().toISOString()}] /off error:`, err);
     res.status(500).json({ error: err.message });
   }
 });
